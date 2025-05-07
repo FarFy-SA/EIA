@@ -1,5 +1,5 @@
 streamlit
 streamlit-authenticator
-PyYAML
+pyrebase4
 requests
 beautifulsoup4
