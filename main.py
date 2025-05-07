@@ -103,8 +103,7 @@ def main():
         user = login_email_password()
     elif choice == "Registrarse":
         register()
-    elif choice == "Iniciar sesión con Google":
-        login_google()
+
 
     if user:
         # Si el usuario ha iniciado sesión correctamente, mostrar el chat
