@@ -21,7 +21,7 @@ auth = firebase.auth()
 
 # Función de inicio de sesión con correo y contraseña
 def login_email_password():
-    email = st.text_input("Correo electrónico", type="email")
+    email = st.text_input("Correo electrónico")
     password = st.text_input("Contraseña", type="password")
     
     if st.button("Iniciar sesión"):
@@ -34,7 +34,7 @@ def login_email_password():
 
 # Función para registrarse
 def register():
-    email = st.text_input("Correo electrónico", type="email")
+    email = st.text_input("Correo electrónico")
     password = st.text_input("Contraseña", type="password")
     
     if st.button("Registrar"):
