@@ -5,8 +5,9 @@ import requests  # Para hacer solicitudes HTTP
 # Configuración de Firebase
 config = {
     "apiKey": "AIzaSyCAypgDMJM17LW08-vrxhJcDMb7yYidy0c",
-    "authDomain": "eduai-f01be.firebaseapp.com",  
-    "projectId": "eduai-f01be",  
+    "authDomain": "eduai-f01be.firebaseapp.com",
+    "databaseURL": "https://eduai-f01be-default-rtdb.firebaseio.com/"
+    "projectId": "eduai-f01be", 
     "storageBucket": "eduai-f01be.firebasestorage.app",  
     "messagingSenderId": "186059253974", 
     "appId": "1:186059253974:web:5cadbf3e23a7869cd18177",  
