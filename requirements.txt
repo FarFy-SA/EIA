@@ -1,5 +1,6 @@
-streamlit
-streamlit-authenticator
-pyrebase4
-requests
-beautifulsoup4
+streamlit==1.34.0
+pyrebase4==5.0.0
+requests==2.31.0
+firebase-admin==6.5.0
+google-auth==2.29.0
+beutifullsoup4
