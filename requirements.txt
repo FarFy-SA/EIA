@@ -3,4 +3,4 @@ pyrebase4
 requests
 firebase-admin
 google-auth
-beutifullsoup4
+beutifulsoup4
