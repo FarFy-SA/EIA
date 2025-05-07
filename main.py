@@ -18,10 +18,6 @@ config = {
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 
-# Función para iniciar sesión con Google
-def login_google():
-    auth_url = auth.get_redirect_url('https://yourapp.com')  # La URL de redirección para autenticar Google
-    st.write(f"Inicia sesión con Google: [Haz clic aquí]({auth_url})")
 
 # Función de inicio de sesión con correo y contraseña
 def login_email_password():
