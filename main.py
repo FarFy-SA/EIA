@@ -130,3 +130,38 @@ def obtener_respuesta_groq(pregunta, historial):
     response = requests.post(url, headers=headers, json=body)
     response.raise_for_status()
     return response.json()["choices"][0]["message"]["content"]
+import streamlit as st
+import pyrebase
+import os
+
+# Configuración de Firebase
+firebase_config = {
+    "apiKey": os.getenv("FIREBASE_API_KEY"),
+    "authDomain": os.getenv("FIREBASE_AUTH_DOMAIN"),
+    "projectId": os.getenv("FIREBASE_PROJECT_ID"),
+    "storageBucket": f"{os.getenv('FIREBASE_PROJECT_ID')}.appspot.com",
+    "messagingSenderId": "123456789",  # opcional
+    "appId": "1:123456789:web:abc123",  # opcional
+    "databaseURL": ""  # opcional si no usas realtime DB
+}
+
+firebase = pyrebase.initialize_app(firebase_config)
+auth = firebase.auth()
+
+st.title("Inicio de sesión con Google")
+
+if "user" not in st.session_state:
+    st.session_state.user = None
+
+if st.session_state.user:
+    st.success(f"Bienvenido, {st.session_state.user['email']}")
+    if st.button("Cerrar sesión"):
+        st.session_state.user = None
+        st.experimental_rerun()
+else:
+    # Redirección a Google
+    login_url = f"https://{firebase_config['authDomain']}/__/auth/handler"
+    st.markdown(f"[Iniciar sesión con Google]({login_url})")
+
+    # Nota: necesitas implementar el manejo del token de ID devuelto.
+    # Esta parte requiere JS o un backend (o Streamlit experimental with JS support).
