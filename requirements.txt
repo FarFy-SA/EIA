@@ -1,6 +1,6 @@
-streamlit==1.34.0
-pyrebase4==5.0.0
-requests==2.31.0
-firebase-admin==6.5.0
-google-auth==2.29.0
+streamlit
+pyrebase4
+requests
+firebase-admin
+google-auth
 beutifullsoup4
