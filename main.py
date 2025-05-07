@@ -1,44 +1,47 @@
+import os
 import streamlit as st
 from duckduckgo_search import DDGS
-import openai
-import os
+from openai import OpenAI
 
-# Configura tu API KEY aquí o usa variable de entorno
-openai.api_key = os.getenv("OPENAI_API_KEY")  # Ponla en Render
+# Inicializa cliente OpenAI desde variables de entorno
+client = OpenAI()
 
-def buscar_en_web(pregunta, max_resultados=5):
+# Función para buscar en internet usando DuckDuckGo
+def buscar_informacion(pregunta):
+    resultados = []
     with DDGS() as ddgs:
-        resultados = ddgs.text(pregunta, max_results=max_resultados)
-        textos = [r['body'] for r in resultados if 'body' in r]
-        return "\n\n".join(textos)
+        for r in ddgs.text(pregunta, max_results=3):
+            resultados.append(r["body"])
+    return resultados
 
-def explicar_como_profesor(pregunta, contenido_web):
-    prompt = f"""
-Eres un profesor experto y paciente. Explica claramente el tema: "{pregunta}" usando la información a continuación.
-Agrega ejemplos si es posible. Sé pedagógico, claro y ordenado.
+# Función para generar explicación con IA
+def explicar_como_profesor(pregunta, textos):
+    contexto = "\n\n".join(textos)
+    prompt = f"""Eres un profesor experto. Usando solo la información a continuación, responde claramente a esta pregunta:
+    
+Pregunta: {pregunta}
 
-Contenido extraído de la web:
-{contenido_web}
-"""
-    respuesta = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.7
+Información:
+{contexto}
+
+Responde:"""
+
+    respuesta = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "user", "content": prompt}]
     )
-    return respuesta.choices[0].message.content.strip()
 
-# --- Interfaz Streamlit ---
-st.title("Tutor IA con Búsqueda Web")
-st.write("Haz una pregunta y te enseñaremos con información real de la web.")
+    return respuesta.choices[0].message.content
 
-pregunta = st.text_input("¿Qué quieres aprender hoy?")
-if st.button("Buscar y enseñar"):
-    if not openai.api_key:
-        st.error("❌ Falta la API Key de OpenAI")
-    elif pregunta:
-        with st.spinner("Buscando información real en la web..."):
-            textos = buscar_en_web(pregunta)
-        with st.spinner("Creando explicación clara como un profesor..."):
-            explicacion = explicar_como_profesor(pregunta, textos)
-        st.success("✅ Aquí tienes tu clase:")
+# Interfaz de usuario con Streamlit
+st.title("Tutor IA 📚")
+st.write("Haz una pregunta y recibirás una explicación con datos actuales.")
+
+pregunta = st.text_input("¿Qué tema quieres aprender?", "")
+
+if pregunta:
+    with st.spinner("Buscando información y generando respuesta..."):
+        textos = buscar_informacion(pregunta)
+        explicacion = explicar_como_profesor(pregunta, textos)
+        st.markdown("### Explicación:")
         st.write(explicacion)
