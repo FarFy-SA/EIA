@@ -1,167 +1,141 @@
 import streamlit as st
-import os
-import requests
-from recolector import recolectar_informacion
-
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
-
-def explicar_con_llama3(pregunta, contexto):
-    url = "https://api.groq.com/openai/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
-        "Content-Type": "application/json"
-    }
-
-    mensajes = [
-        {"role": "system", "content": "Eres un profesor que explica conceptos con claridad usando información confiable."},
-        {"role": "user", "content": f"Pregunta: {pregunta}\n\nContexto:\n{contexto}"}
-    ]
-
-    data = {
-        "model": "llama3-8b-8192",
-        "messages": mensajes,
-        "temperature": 0.5,
-        "max_tokens": 1024
-    }
-
-    response = requests.post(url, headers=headers, json=data)
-    
-    if response.status_code == 200:
-        return response.json()["choices"][0]["message"]["content"]
-    else:
-        return f"❌ Error {response.status_code}: {response.text}"
-
-st.title("Tutor IA con Groq + LLaMA 3")
-
-pregunta = st.text_input("¿Qué quieres aprender hoy?")
-
-if pregunta:
-    with st.spinner("Buscando información en la web..."):
-        contexto = recolectar_informacion(pregunta)
-
-    st.success("Información recopilada. Generando explicación...")
-    resultado = explicar_con_llama3(pregunta, contexto)
-    st.markdown("Explicación")
-    st.write(resultado)
-import streamlit as st
-import streamlit_authenticator as stauth
-import requests
-import os
-
-# ========== CONFIGURAR LOGIN ==========
-NOMBRES = ['Ana Gómez', 'Luis Pérez']
-USUARIOS = ['ana', 'luis']
-CLAVES = stauth.Hasher(['123', '456']).generate()
-
-authenticator = stauth.Authenticate(
-    NOMBRES, USUARIOS, CLAVES,
-    'cookie_tutor', 'random_signature_key', cookie_expiry_days=1
-)
-
-# ========== INICIO DE SESIÓN ==========
-nombre, estado_autenticacion, usuario = authenticator.login("Iniciar sesión", "main")
-
-if estado_autenticacion:
-    authenticator.logout("Cerrar sesión", "sidebar")
-    st.sidebar.success(f"Bienvenido, {nombre}")
-
-    # ========== MÚLTIPLES CLASES ==========
-    if 'clases' not in st.session_state:
-        st.session_state.clases = {}
-
-    clase = st.sidebar.selectbox("Selecciona una clase", list(st.session_state.clases.keys()) + ["+ Nueva clase"])
-
-    if clase == "+ Nueva clase":
-        nueva_clase = st.sidebar.text_input("Nombre de la nueva clase:")
-        if st.sidebar.button("Crear clase") and nueva_clase:
-            st.session_state.clases[nueva_clase] = []
-            clase = nueva_clase
-
-    if clase not in st.session_state.clases:
-        st.session_state.clases[clase] = []
-
-    historial = st.session_state.clases[clase]
-
-    # ========== INTERFAZ PRINCIPAL ==========
-    st.title("Tutor IA con Groq + LLaMA 3")
-
-    pregunta = st.text_input("Haz una pregunta sobre lo que quieras aprender:")
-
-    if st.button("Preguntar") and pregunta:
-        with st.spinner("Pensando..."):
-            try:
-                respuesta = obtener_respuesta_groq(pregunta, historial)
-                historial.append({"rol": "user", "contenido": pregunta})
-                historial.append({"rol": "assistant", "contenido": respuesta})
-            except Exception as e:
-                st.error(f"Error: {e}")
-
-    # Mostrar historial de conversación
-    for msg in historial:
-        if msg["rol"] == "user":
-            st.markdown(f"**Tú:** {msg['contenido']}")
-        else:
-            st.markdown(f"**Tutor IA:** {msg['contenido']}")
-
-elif estado_autenticacion is False:
-    st.error("Usuario o contraseña incorrectos")
-elif estado_autenticacion is None:
-    st.warning("Por favor inicia sesión")
-
-# ========== LLAMADA A GROQ API ==========
-def obtener_respuesta_groq(pregunta, historial):
-    url = "https://api.groq.com/openai/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {os.getenv('GROQ_API_KEY')}",
-        "Content-Type": "application/json"
-    }
-
-    mensajes = [{"role": "system", "content": "Eres un tutor que explica con claridad a estudiantes"}]
-    for h in historial:
-        mensajes.append({"role": h["rol"], "content": h["contenido"]})
-    mensajes.append({"role": "user", "content": pregunta})
-
-    body = {
-        "model": "llama3-8b-8192",
-        "messages": mensajes,
-        "temperature": 0.7
-    }
-
-    response = requests.post(url, headers=headers, json=body)
-    response.raise_for_status()
-    return response.json()["choices"][0]["message"]["content"]
-import streamlit as st
 import pyrebase
-import os
+import requests  # Para hacer solicitudes HTTP
 
 # Configuración de Firebase
-firebase_config = {
-    "apiKey": os.getenv("FIREBASE_API_KEY"),
-    "authDomain": os.getenv("FIREBASE_AUTH_DOMAIN"),
-    "projectId": os.getenv("FIREBASE_PROJECT_ID"),
-    "storageBucket": f"{os.getenv('FIREBASE_PROJECT_ID')}.appspot.com",
-    "messagingSenderId": "123456789",  # opcional
-    "appId": "1:123456789:web:abc123",  # opcional
-    "databaseURL": ""  # opcional si no usas realtime DB
+config = {
+    "apiKey": "AIzaSyCAypgDMJM17LW08-vrxhJcDMb7yYidy0c",
+    "authDomain": "eduai-f01be.firebaseapp.com",  
+    "projectId": "eduai-f01be",  
+    "storageBucket": "eduai-f01be.firebasestorage.app",  
+    "messagingSenderId": "186059253974", 
+    "appId": "1:186059253974:web:5cadbf3e23a7869cd18177",  
+    "measurementId": "G-1KL6LJ87EV"  
 }
 
-firebase = pyrebase.initialize_app(firebase_config)
+# Inicialización de Firebase
+firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 
-st.title("Inicio de sesión con Google")
+# Función para iniciar sesión con Google
+def login_google():
+    auth_url = auth.get_redirect_url('https://yourapp.com')  # La URL de redirección para autenticar Google
+    st.write(f"Inicia sesión con Google: [Haz clic aquí]({auth_url})")
 
-if "user" not in st.session_state:
-    st.session_state.user = None
+# Función de inicio de sesión con correo y contraseña
+def login_email_password():
+    email = st.text_input("Correo electrónico", type="email")
+    password = st.text_input("Contraseña", type="password")
+    
+    if st.button("Iniciar sesión"):
+        try:
+            user = auth.sign_in_with_email_and_password(email, password)
+            st.success(f"Bienvenido {user['email']}")
+            return user  # Retorna el usuario autenticado
+        except:
+            st.error("Error al iniciar sesión")
 
-if st.session_state.user:
-    st.success(f"Bienvenido, {st.session_state.user['email']}")
-    if st.button("Cerrar sesión"):
-        st.session_state.user = None
-        st.experimental_rerun()
-else:
-    # Redirección a Google
-    login_url = f"https://{firebase_config['authDomain']}/__/auth/handler"
-    st.markdown(f"[Iniciar sesión con Google]({login_url})")
+# Función para registrarse
+def register():
+    email = st.text_input("Correo electrónico", type="email")
+    password = st.text_input("Contraseña", type="password")
+    
+    if st.button("Registrar"):
+        try:
+            auth.create_user_with_email_and_password(email, password)
+            st.success("Usuario registrado correctamente!")
+        except:
+            st.error("Error al registrar el usuario")
 
-    # Nota: necesitas implementar el manejo del token de ID devuelto.
-    # Esta parte requiere JS o un backend (o Streamlit experimental with JS support).
+# Función para mostrar el chat
+def show_chat(messages):
+    for message in messages:
+        if message['user'] == 'system':
+            st.markdown(f"**Sistema:** {message['text']}")
+        else:
+            st.markdown(f"**{message['user']}**: {message['text']}")
+
+# Función para guardar un mensaje en Firebase
+def save_message(user, text, is_system=False):
+    db = firebase.database()
+    conversation = {
+        'user': user,
+        'text': text,
+        'is_system': is_system
+    }
+    db.child("conversations").push(conversation)
+
+# Función para obtener las conversaciones de Firebase
+def get_conversations(user_email):
+    db = firebase.database()
+    conversations = db.child("conversations").order_by_child("user").equal_to(user_email).get()
+    return conversations.val() if conversations else []
+
+# Función para obtener respuesta desde Llama3
+def generate_response_from_llama3(user_message):
+    # Suponiendo que Llama3 tiene un endpoint para hacer solicitudes.
+    api_url = "https://api.llama3.com/generate"  # URL de ejemplo
+    api_key = "GROQ_API_KEY"  # Reemplaza con tu clave de API de Llama3
+    
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+    
+    payload = {
+        "prompt": user_message,
+        "max_tokens": 150  
+    }
+    
+    response = requests.post(api_url, headers=headers, json=payload)
+    
+    if response.status_code == 200:
+        return response.json().get('text', 'Lo siento, no puedo generar una respuesta ahora.')
+    else:
+        return "Error al obtener respuesta de Llama3"
+
+# Función principal
+def main():
+    st.title("Bienvenido a la Plataforma de Aprendizaje")
+
+    menu = ["Iniciar sesión", "Registrarse", "Iniciar sesión con Google"]
+    choice = st.sidebar.selectbox("Selecciona una opción", menu)
+
+    user = None
+    if choice == "Iniciar sesión":
+        user = login_email_password()
+    elif choice == "Registrarse":
+        register()
+    elif choice == "Iniciar sesión con Google":
+        login_google()
+
+    if user:
+        # Si el usuario ha iniciado sesión correctamente, mostrar el chat
+        user_email = user['email']
+        
+        # Recuperar las conversaciones de Firebase
+        messages = get_conversations(user_email)
+
+        # Mostrar el historial del chat
+        show_chat(messages)
+
+        # Crear un campo para que el usuario escriba su mensaje
+        user_message = st.text_input("Escribe una pregunta")
+
+        if st.button("Enviar"):
+            if user_message:
+                # Guardamos el mensaje del usuario en Firebase
+                save_message(user_email, user_message, is_system=False)
+
+                # Obtener respuesta desde Llama3
+                respuesta_ia = generate_response_from_llama3(user_message)
+                save_message('system', respuesta_ia, is_system=True)
+
+                # Recuperar nuevamente las conversaciones para mostrarlas
+                messages = get_conversations(user_email)
+
+                # Mostrar el historial actualizado
+                show_chat(messages)
+
+if __name__ == "__main__":
+    main()
