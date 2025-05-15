@@ -26,7 +26,7 @@ def generate_response(user_input, conversation_history=[]):
             "Explica la teoría, da ejemplos, y compara con el concepto. "
             "Si el tema es teórico, proporciona una tarea breve para comprobar el aprendizaje. "
             "Aprende el estilo de aprendizaje del usuario y adáptate a él con el tiempo."
-            "Debes de dar respuestas con una estrucutra constante para que el alumno se acople bien a el contenido.
+            "Debes de dar respuestas con una estrucutra constante para que el alumno se acople bien a el contenido."
 "
         )
     }
