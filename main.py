@@ -32,7 +32,7 @@ def generate_response(conversation_history):
 # Configurar Streamlit
 st.set_page_config(page_title="Tutor Educativo", page_icon="🎓")
 
-st.title("🎓 Tutor Educativo con GROQ")
+st.title("Tutor con IA")
 
 if "messages" not in st.session_state:
     st.session_state.messages = [
