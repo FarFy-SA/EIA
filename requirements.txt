@@ -1,6 +1,6 @@
-streamlit
-pyrebase4
-requests
-firebase-admin
-google-auth
-beautifulsoup4
+fastapi==0.110.0
+uvicorn==0.27.1
+pydantic==2.6.4
+httpx==0.27.0
+deepseek==0.1.2
+python-dotenv==1.0.1
