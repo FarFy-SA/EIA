@@ -1,78 +1,62 @@
 import os
 import requests
-import streamlit as st
 from dotenv import load_dotenv
 
-# Cargar claves
+# Cargar variables de entorno
 load_dotenv()
-API_KEY = os.getenv("DEEPSEEK_API_KEY")
-API_BASE = os.getenv("DEEPSEEK_API_BASE")
-
-# Verificación
-if not API_KEY or not API_BASE:
-    st.error("❌ Las variables DEEPSEEK_API_KEY y DEEPSEEK_API_BASE no están configuradas.")
-    st.stop()
+API_KEY = os.getenv("GROQ_API_KEY")  # Define esto en tu archivo .env
+API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 HEADERS = {
     "Authorization": f"Bearer {API_KEY}",
     "Content-Type": "application/json",
 }
 
-# Inicializar conversación
-if "messages" not in st.session_state:
-    st.session_state.messages = []
+def generate_response(user_input, conversation_history=[]):
+    conversation_history.append({"role": "user", "content": user_input})
 
-# Función para enviar mensajes a la API
-def ask_deepseek(messages):
+    # Mensaje inicial del sistema
+    system_prompt = {
+        "role": "system",
+        "content": (
+            "Eres un asistente educativo inteligente. "
+            "Tu función es enseñar de forma ética. "
+            "No des respuestas directamente en ejercicios prácticos; guía al usuario. "
+            "Explica la teoría, da ejemplos, y compara con el concepto. "
+            "Si el tema es teórico, proporciona una tarea breve para comprobar el aprendizaje. "
+            "Adáptate al estilo del usuario con el tiempo y mantén una estructura constante."
+        )
+    }
+
     data = {
-        "model": "deepseek-chat",
-        "messages": messages,
+        "model": "llama3-70b-8192",  # Puedes cambiar a mixtral-8x7b-32768, etc.
+        "messages": [system_prompt] + conversation_history,
         "temperature": 0.7,
         "max_tokens": 600
     }
+
     try:
-        response = requests.post(f"{API_BASE}/chat/completions", headers=HEADERS, json=data)
+        response = requests.post(API_URL, headers=HEADERS, json=data)
         response.raise_for_status()
         result = response.json()
-        return result["choices"][0]["message"]["content"]
-    except Exception as e:
-        return f"❌ Error al conectar con la API: {e}"
+        message = result["choices"][0]["message"]["content"]
+        conversation_history.append({"role": "assistant", "content": message})
+        return message, conversation_history
+    except requests.exceptions.RequestException as e:
+        return f"❌ Error en la llamada a la API: {e}", conversation_history
 
-# Interfaz de chat
-st.title("🎓 Tutor Educativo AI")
-st.caption("Basado en DeepSeek API. Escribe tu duda sobre cualquier tema académico.")
+def run_chat():
+    print("🎓 Bienvenido a tu tutor educativo gratuito con GROQ. ¿Qué quieres aprender hoy?")
+    conversation_history = []
 
-# Entrada del usuario
-user_input = st.chat_input("Escribe aquí...")
+    while True:
+        user_input = input("\nTú: ")
+        if user_input.lower() in ["salir", "exit", "quit"]:
+            print("📚 Sesión terminada. ¡Sigue aprendiendo!")
+            break
 
-# Sistema educativo (mensaje base)
-system_message = {
-    "role": "system",
-    "content": (
-        "Eres un asistente educativo inteligente. "
-        "Tu función es enseñar de forma ética. "
-        "No des respuestas directamente en ejercicios prácticos; guía al usuario. "
-        "Explica la teoría, da ejemplos, y compara con el concepto. "
-        "Si el tema es teórico, proporciona una tarea breve para comprobar el aprendizaje. "
-        "Aprende el estilo de aprendizaje del usuario y adáptate a él con el tiempo."
-    )
-}
+        response, conversation_history = generate_response(user_input, conversation_history)
+        print(f"\n🤖 Tutor: {response}")
 
-# Mostrar historial del chat
-for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
-
-# Si hay mensaje nuevo
-if user_input:
-    st.session_state.messages.append({"role": "user", "content": user_input})
-    with st.chat_message("user"):
-        st.markdown(user_input)
-
-    # Insertar el mensaje del sistema al principio
-    history = [system_message] + st.session_state.messages
-    assistant_response = ask_deepseek(history)
-
-    st.session_state.messages.append({"role": "assistant", "content": assistant_response})
-    with st.chat_message("assistant"):
-        st.markdown(assistant_response)
+if __name__ == "__main__":
+    run_chat()
