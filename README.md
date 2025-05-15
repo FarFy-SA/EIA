@@ -1,4 +1,4 @@
-# 🧠 Tutor IA con Búsqueda Web
+# 🧠 Tutor IA
 
 Una plataforma educativa que busca en internet en tiempo real y explica como un profesor usando IA.
 
