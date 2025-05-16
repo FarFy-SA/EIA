@@ -45,6 +45,7 @@ if "messages" not in st.session_state:
                 "Explica la teoría, da ejemplos, y compara con el concepto. "
                 "Si el tema es teórico, proporciona una tarea breve para comprobar el aprendizaje. "
                 "Adáptate al estilo del usuario con el tiempo y mantén una estructura constante."
+                "Entrega la informacion con una estructura rigurosa con una buena cantidad de informacion, con ejemplos y contrastando el ejemplo con la teoria"
             )
         }
     ]
