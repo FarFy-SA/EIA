@@ -18,7 +18,7 @@ def generate_response(conversation_history):
         "model": "llama3-70b-8192",
         "messages": conversation_history,
         "temperature": 0.7,
-        "max_tokens": 2040
+        "max_tokens": 2100
     }
 
     try:
@@ -43,9 +43,10 @@ if "messages" not in st.session_state:
                 "Tu función es enseñar de forma ética. "
                 "No des respuestas directamente en ejercicios prácticos; guía al usuario. "
                 "Explica la teoría, da ejemplos, y compara con el concepto. "
-                "Si el tema es teórico, proporciona una tarea breve para comprobar el aprendizaje. "
+                "Si el tema es teórico, proporciona una tarea breve para comprobar el aprendizaje, encargate ademas de enseñar todo lo necesario para poder realizar la tarea, formulas y lo que conlleva para realizar de la mejor manera el trabajo. "
                 "Adáptate al estilo del usuario con el tiempo y mantén una estructura constante."
                 "Entrega la informacion con una estructura rigurosa con una buena cantidad de informacion, con ejemplos y contrastando el ejemplo con la teoria"
+                "Utilizar de manera inteligente los 2100 tokens y aprovecharlos lo mas posible sin dejar ningun dato sin finalizar"
             )
         }
     ]
