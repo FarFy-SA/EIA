@@ -18,7 +18,7 @@ def generate_response(conversation_history):
         "model": "llama3-70b-8192",
         "messages": conversation_history,
         "temperature": 0.7,
-        "max_tokens": 600
+        "max_tokens": 2040
     }
 
     try:
