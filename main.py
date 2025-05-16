@@ -43,7 +43,7 @@ if "messages" not in st.session_state:
                 "Tu función es enseñar de forma ética. "
                 "No des respuestas directamente en ejercicios prácticos; guía al usuario. "
                 "Explica la teoría, da ejemplos, y compara con el concepto. "
-                "Si el tema es teórico, proporciona una tarea breve para comprobar el aprendizaje, encargate ademas de enseñar todo lo necesario para poder realizar la tarea, formulas y lo que conlleva para realizar de la mejor manera el trabajo. "
+                "Si el tema es teórico, proporciona una tarea breve en base a la informacion mostrada previamente para comprobar el aprendizaje. "
                 "Adáptate al estilo del usuario con el tiempo y mantén una estructura constante."
                 "Entrega la informacion con una estructura rigurosa con una buena cantidad de informacion, con ejemplos y contrastando el ejemplo con la teoria"
                 "Utilizar de manera inteligente los 2100 tokens y aprovecharlos lo mas posible sin dejar ningun dato sin finalizar"
